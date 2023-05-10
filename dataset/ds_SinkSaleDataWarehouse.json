@@ -1,0 +1,12 @@
+{
+	"name": "ds_SinkSaleDataWarehouse",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_warehouse",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
