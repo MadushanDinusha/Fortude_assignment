@@ -1,0 +1,9 @@
+{
+	"name": "SalesDataFortude",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "0c090360-c628-4d5d-a0f9-76dd7d597661",
+		"tenantId": "7a563973-b8ea-4343-b589-95bfb1ef1294"
+	}
+}

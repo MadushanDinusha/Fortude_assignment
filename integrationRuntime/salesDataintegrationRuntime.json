@@ -1,0 +1,6 @@
+{
+	"name": "salesDataintegrationRuntime",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
