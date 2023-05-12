@@ -12,14 +12,37 @@
 					"name": "salesSourceDf"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_SinkSaleDataWarehouse",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSalesWh"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     enableCdc: true,",
+				"     mode: 'read',",
+				"     skipInitialLoad: false,",
+				"     waterMarkColumn: 'ingestion_ts',",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT TOP (1000) [SalesOrderID]\\n      ,[SalesOrderDetailID]\\n      ,[CarrierTrackingNumber]\\n      ,[OrderQty]\\n      ,[ProductID]\\n      ,[SpecialOfferID]\\n      ,[UnitPrice]\\n      ,[UnitPriceDiscount]\\n      ,[LineTotal]\\n      ,[rowguid]\\n      ,[ModifiedDate]\\n  FROM [AdventureWorks2019].[Sales].[SalesOrderDetail]',",
-				"     format: 'query') ~> salesSourceDf"
+				"     format: 'query') ~> salesSourceDf",
+				"salesSourceDf sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     partitionBy('hash', 1)) ~> sinkSalesWh"
 			]
 		}
 	}
