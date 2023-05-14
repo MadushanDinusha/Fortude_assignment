@@ -3,35 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "SqlServerSource",
-						"sqlReaderQuery": "SELECT TOP (1000) [SalesOrderID]\n      ,[RevisionNumber]\n      ,[OrderDate]\n      ,[DueDate]\n      ,[ShipDate]\n      ,[Status]\n      ,[OnlineOrderFlag]\n      ,[SalesOrderNumber]\n      ,[PurchaseOrderNumber]\n      ,[AccountNumber]\n      ,[CustomerID]\n      ,[SalesPersonID]\n      ,[TerritoryID]\n      ,[BillToAddressID]\n      ,[ShipToAddressID]\n      ,[ShipMethodID]\n      ,[CreditCardID]\n      ,[CreditCardApprovalCode]\n      ,[CurrencyRateID]\n      ,[SubTotal]\n      ,[TaxAmt]\n      ,[Freight]\n      ,[TotalDue]\n      ,[Comment]\n      ,[rowguid]\n      ,[ModifiedDate]\n  FROM [AdventureWorks2019].[Sales].[SalesOrderHeader]",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "ds_salesData",
-						"type": "DatasetReference",
-						"parameters": {
-							"table": "SalesOrderHeader",
-							"schema": "Sales"
-						}
-					}
-				}
-			},
-			{
 				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
@@ -46,11 +17,6 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"additionalColumns": [
-							{
-								"value": "$$COLUMN:"
-							}
-						],
 						"sqlReaderQuery": "SELECT\nSD.SalesOrderDetailID AS SalesOrderDetailKey,\nSH.SalesOrderID AS SalesOrderKey,\nSD.ProductID AS ProductKey,\nSD.SpecialOfferID AS SpecialOfferKey,\nSH.Status AS SalesOrderStatusKey,\nSH.OnlineOrderFlag AS SalesOnlineOrderFlag,\nSH.AccountNumber AS SalesOrderAccountNumber,\nSH.CustomerID AS SalesOrderCustomerKey,\nISNULL(SH.SalesPersonID,0) AS SalesPersonKey,\nSH.TerritoryID AS TerritoryKey,\nSH.BillToAddressID AS BillToAddressKey,\nSH.ShipToAddressID AS ShipToAddressKey,\nSH.ShipMethodID AS ShipMethodKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SD.ModifiedDate,112)) AS SalesOrderDetailModifiedDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.OrderDate,112)) AS SalesOrderDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.DueDate,112)) AS SalesOrderDueDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.ShipDate,112)) AS SalesOrderShipDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.ModifiedDate,112)) AS SalesOrderModifiedDateKey,\nSD.OrderQty,\nSD.UnitPrice,\nSD.UnitPriceDiscount,\nSD.LineTotal,\nSH.SubTotal AS SalesOrderSubTotal,\nSH.TaxAmt AS SalesOrderTaxAmount,\nSH.Freight AS SalesOrderFreightAmount,\nSH.TotalDue AS SalesOrderTotalDueAmount\nFROM Sales.SalesOrderDetail SD\n\tLEFT JOIN Sales.SalesOrderHeader SH ON SD.SalesOrderID = SH.SalesOrderID",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
@@ -66,26 +32,314 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "SalesOrderID",
+									"name": "SalesOrderDetailKey",
 									"type": "Int32",
 									"physicalType": "int"
 								},
 								"sink": {
-									"name": "id",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "SalesOrderDetailKey",
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							},
 							{
 								"source": {
-									"name": "SalesOrderDetailID",
+									"name": "SalesOrderKey",
 									"type": "Int32",
 									"physicalType": "int"
 								},
 								"sink": {
-									"name": "name",
+									"name": "SalesOrderKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ProductKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "ProductKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SpecialOfferKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SpecialOfferKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderStatusKey",
+									"type": "Byte",
+									"physicalType": "tinyint"
+								},
+								"sink": {
+									"name": "SalesOrderStatusKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOnlineOrderFlag",
+									"type": "Boolean",
+									"physicalType": "bit"
+								},
+								"sink": {
+									"name": "SalesOnlineOrderFlagKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderAccountNumber",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "SalesOrderAccountNumber",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderCustomerKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderCustomerKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesPersonKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesPersonKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "TerritoryKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "TerritoryKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "BillToAddressKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "BillToAddressKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ShipToAddressKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "ShipToAddressKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ShipMethodKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "ShipMethodKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderDetailModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderDetailModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderDueDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderDueDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderShipDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderShipDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "OrderQty",
+									"type": "Int16",
+									"physicalType": "smallint"
+								},
+								"sink": {
+									"name": "OrderQty",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "UnitPriceDiscount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "UnitPrice",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "LineTotal",
+									"type": "Decimal",
+									"physicalType": "decimal",
+									"scale": 6,
+									"precision": 38
+								},
+								"sink": {
+									"name": "LineTotal",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderSubTotal",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "SalesOrderSubTotal",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderTaxAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "SalesOrderTaxAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderFreightAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "SalesOrderFreighAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderTotalDueAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "SalesOrderTotalDueAmount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
 								}
 							}
 						],
@@ -111,10 +365,7 @@
 						"referenceName": "ds_SinkSaleDataWarehouse",
 						"type": "DatasetReference",
 						"parameters": {
-							"table": {
-								"value": "@pipeline().parameters.tableName",
-								"type": "Expression"
-							}
+							"table": "Fact_SalesOrderDetail"
 						}
 					}
 				]
