@@ -1,9 +1,9 @@
 {
-	"name": "pipeline1",
+	"name": "DataCopyPipeline",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Copy Fact Table Data",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -98,8 +98,8 @@
 								},
 								"sink": {
 									"name": "SalesOnlineOrderFlagKey",
-									"type": "Int32",
-									"physicalType": "int"
+									"type": "Boolean",
+									"physicalType": "bit"
 								}
 							},
 							{
@@ -194,6 +194,18 @@
 								},
 								"sink": {
 									"name": "SalesOrderDetailModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SalesOrderDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SalesOrderDateKey",
 									"type": "Int32",
 									"physicalType": "int"
 								}
@@ -248,7 +260,7 @@
 							},
 							{
 								"source": {
-									"name": "UnitPriceDiscount",
+									"name": "UnitPrice",
 									"type": "Decimal",
 									"physicalType": "money",
 									"scale": 4,
@@ -256,6 +268,22 @@
 								},
 								"sink": {
 									"name": "UnitPrice",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								}
+							},
+							{
+								"source": {
+									"name": "UnitPriceDiscount",
+									"type": "Decimal",
+									"physicalType": "money",
+									"scale": 4,
+									"precision": 19
+								},
+								"sink": {
+									"name": "UnitPriceDiscount",
 									"type": "Decimal",
 									"physicalType": "money",
 									"scale": 4,
@@ -353,11 +381,7 @@
 				"inputs": [
 					{
 						"referenceName": "ds_salesData",
-						"type": "DatasetReference",
-						"parameters": {
-							"table": "SalesOrderDetail",
-							"schema": "Sales"
-						}
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
@@ -369,13 +393,245 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Copy Dim  Product Data",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT\nP.ProductID AS ProductKey,\nP.[Name] AS ProductName,\nISNULL(PC.[Name],'N/A') AS ProductCategory,\nISNULL(PSC.[Name],'N/A') AS ProductSubCategory,\nP.ProductNumber AS ProductNumber,\nP.MakeFlag,\nP.FinishedGoodsFlag,\nISNULL(P.Color,'N/A') AS Color,\nISNULL(P.Size,'N/A') AS Size,\nISNULL(UM_Size.[Name],'N/A') AS SizeUnitMeasure,\nISNULL(P.[Weight],0) AS [Weight],\nISNULL(UM_Weight.[Name],'N/A') AS WeightUnitMeasure,\nCONVERT(INT, CONVERT(VARCHAR(8), SellStartDate, 112)) AS SellStartDateKey,\nISNULL(CONVERT(INT, CONVERT(VARCHAR(8), SellEndDate, 112)),'99991231') AS SellEndDateKey,\nISNULL(CONVERT(INT, CONVERT(VARCHAR(8), DiscontinuedDate, 112)),'99991231') AS DiscontinuedDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8), P.ModifiedDate, 112)) AS ModifiedDateKey\n\nFROM Production.Product P\nLEFT JOIN Production.ProductSubcategory PSC ON P.ProductSubcategoryID = PSC.ProductSubcategoryID\nLEFT JOIN Production.ProductCategory PC ON PSC.ProductCategoryID = PC.ProductCategoryID\nLEFT JOIN Production.UnitMeasure UM_Size ON P.SizeUnitMeasureCode = UM_Size.UnitMeasureCode\nLEFT JOIN Production.UnitMeasure UM_Weight ON P.WeightUnitMeasureCode = UM_Weight.UnitMeasureCode",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "ProductKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "ProductKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ProductName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ProductName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ProductCategory",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ProductCategory",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ProductNumber",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ProductNumber",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "MakeFlag",
+									"type": "Boolean",
+									"physicalType": "bit"
+								},
+								"sink": {
+									"name": "MakeFlag",
+									"type": "Boolean",
+									"physicalType": "bit"
+								}
+							},
+							{
+								"source": {
+									"name": "FinishedGoodsFlag",
+									"type": "Boolean",
+									"physicalType": "bit"
+								},
+								"sink": {
+									"name": "FinishedGoodsFlag",
+									"type": "Boolean",
+									"physicalType": "bit"
+								}
+							},
+							{
+								"source": {
+									"name": "Color",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Color",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Size",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Size",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SizeUnitMeasure",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "SizeUnitMeasure",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Weight",
+									"type": "Decimal",
+									"physicalType": "decimal",
+									"scale": 2,
+									"precision": 8
+								},
+								"sink": {
+									"name": "Weight",
+									"type": "Decimal",
+									"physicalType": "decimal",
+									"scale": 0,
+									"precision": 18
+								}
+							},
+							{
+								"source": {
+									"name": "WeightUnitMeasure",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "WeightUnitMeasure",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SellStartDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SellStartDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "SellEndDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "SellEndDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "DiscontinuedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "DiscontinuedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "ModifiedDateKey",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_salesData",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_SinkSaleDataWarehouse",
+						"type": "DatasetReference",
+						"parameters": {
+							"table": "Dim_Product"
+						}
+					}
+				]
 			}
 		],
-		"parameters": {
-			"tableName": {
-				"type": "String"
-			}
-		},
 		"annotations": []
 	}
 }
