@@ -51,7 +51,7 @@
 								"value": "$$COLUMN:"
 							}
 						],
-						"sqlReaderQuery": "SELECT TOP (1000) [SalesOrderID]\n      ,[SalesOrderDetailID]\n      ,[CarrierTrackingNumber]\n      ,[OrderQty]\n      ,[ProductID]\n      ,[SpecialOfferID]\n      ,[UnitPrice]\n      ,[UnitPriceDiscount]\n      ,[LineTotal]\n      ,[rowguid]\n      ,[ModifiedDate]\n  FROM [AdventureWorks2019].[Sales].[SalesOrderDetail]",
+						"sqlReaderQuery": "SELECT\nSD.SalesOrderDetailID AS SalesOrderDetailKey,\nSH.SalesOrderID AS SalesOrderKey,\nSD.ProductID AS ProductKey,\nSD.SpecialOfferID AS SpecialOfferKey,\nSH.Status AS SalesOrderStatusKey,\nSH.OnlineOrderFlag AS SalesOnlineOrderFlag,\nSH.AccountNumber AS SalesOrderAccountNumber,\nSH.CustomerID AS SalesOrderCustomerKey,\nISNULL(SH.SalesPersonID,0) AS SalesPersonKey,\nSH.TerritoryID AS TerritoryKey,\nSH.BillToAddressID AS BillToAddressKey,\nSH.ShipToAddressID AS ShipToAddressKey,\nSH.ShipMethodID AS ShipMethodKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SD.ModifiedDate,112)) AS SalesOrderDetailModifiedDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.OrderDate,112)) AS SalesOrderDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.DueDate,112)) AS SalesOrderDueDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.ShipDate,112)) AS SalesOrderShipDateKey,\nCONVERT(INT, CONVERT(VARCHAR(8),SH.ModifiedDate,112)) AS SalesOrderModifiedDateKey,\nSD.OrderQty,\nSD.UnitPrice,\nSD.UnitPriceDiscount,\nSD.LineTotal,\nSH.SubTotal AS SalesOrderSubTotal,\nSH.TaxAmt AS SalesOrderTaxAmount,\nSH.Freight AS SalesOrderFreightAmount,\nSH.TotalDue AS SalesOrderTotalDueAmount\nFROM Sales.SalesOrderDetail SD\n\tLEFT JOIN Sales.SalesOrderHeader SH ON SD.SalesOrderID = SH.SalesOrderID",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -111,12 +111,20 @@
 						"referenceName": "ds_SinkSaleDataWarehouse",
 						"type": "DatasetReference",
 						"parameters": {
-							"table": "temp"
+							"table": {
+								"value": "@pipeline().parameters.tableName",
+								"type": "Expression"
+							}
 						}
 					}
 				]
 			}
 		],
+		"parameters": {
+			"tableName": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
