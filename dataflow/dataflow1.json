@@ -37,6 +37,12 @@
 				},
 				{
 					"name": "filter1"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -60,6 +66,8 @@
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
 				"lookup1 filter(!isNull(sink_id)) ~> filter1",
+				"derivedColumn2 alterRow() ~> alterRow1",
+				"filter1 derive(is_Latest = 0) ~> derivedColumn2",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:true,",
