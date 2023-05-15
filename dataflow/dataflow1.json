@@ -10,6 +10,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "salesSourceDf"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_SinkSaleDataWarehouse",
+						"type": "DatasetReference"
+					},
+					"name": "sinkTable"
 				}
 			],
 			"sinks": [
@@ -21,23 +28,40 @@
 					"name": "sinkSalesWh"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup1"
+				}
+			],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     enableCdc: true,",
-				"     mode: 'read',",
-				"     skipInitialLoad: false,",
-				"     waterMarkColumn: 'ingestion_ts',",
+				"     enableNativeCdc: true,",
+				"     netChanges: true,",
+				"     skipInitialLoad: true,",
+				"     waterMarkColumn: 'Modified_date',",
+				"     batchSize: 1000,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     query: 'SELECT TOP (1000) [SalesOrderID]\\n      ,[SalesOrderDetailID]\\n      ,[CarrierTrackingNumber]\\n      ,[OrderQty]\\n      ,[ProductID]\\n      ,[SpecialOfferID]\\n      ,[UnitPrice]\\n      ,[UnitPriceDiscount]\\n      ,[LineTotal]\\n      ,[rowguid]\\n      ,[ModifiedDate]\\n  FROM [AdventureWorks2019].[Sales].[SalesOrderDetail]',",
-				"     format: 'query') ~> salesSourceDf",
-				"salesSourceDf sink(allowSchemaDrift: true,",
+				"     format: 'table',",
+				"     mode: 'read') ~> salesSourceDf",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     deletable:false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sinkTable",
+				"salesSourceDf derive(isLatest = 1) ~> derivedColumn1",
+				"salesSourceDf, sinkTable lookup(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
 				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
+				"     updateable:true,",
+				"     upsertable:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
