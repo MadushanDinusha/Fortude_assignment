@@ -26,6 +26,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sinkSalesWh"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_SinkSaleDataWarehouse",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
 				}
 			],
 			"transformations": [
@@ -66,7 +73,7 @@
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
 				"lookup1 filter(!isNull(sink_id)) ~> filter1",
-				"derivedColumn2 alterRow() ~> alterRow1",
+				"derivedColumn2 alterRow(updateIf(1==1)) ~> alterRow1",
 				"filter1 derive(is_Latest = 0) ~> derivedColumn2",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
@@ -78,7 +85,17 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
-				"     partitionBy('hash', 1)) ~> sinkSalesWh"
+				"     partitionBy('hash', 1)) ~> sinkSalesWh",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
